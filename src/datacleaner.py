@@ -1,4 +1,19 @@
 import pandas as pd
+import logging
+import os
+from dotenv import load_dotenv
+
+# ----------------------------------------
+# Carregar Variáveis de Ambiente do .env
+# ----------------------------------------
+load_dotenv()
+
+# ----------------------------------------
+# Configuração Padrão do Logging (INFO para produção)
+# Configuração global para este módulo, formatando a saída com data/hora e nível.
+# ----------------------------------------
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class DataCleaner:
     """
@@ -26,9 +41,8 @@ class DataCleaner:
         self.args = args
         self.config = kwargs
         if self.config:
-            print(f"Configurações adicionais carregadas: {self.config}")
-        # print('DataCleaner inicializado.')
-        print(f"DataCleaner inicializado com {len(self.df)} linhas.")
+            logger.info(f"Configurações adicionais carregadas: {self.config}")
+        logger.info(f"DataCleaner inicializado com {len(self.df)} linhas.")
     
     def calcular_faturamento(self) -> pd.DataFrame: 
         """
@@ -60,18 +74,19 @@ class DataCleaner:
             O DataFrame final após todas as etapas de processamento.
         '''
         self.calcular_faturamento()
-        print("— Faturamento calculado.")
+        logger.info("— Faturamento calculado.")
         return self.df
     
     @classmethod
-    def from_csv(cls, caminho_arquivo: str, *args, **kwargs) -> 'DataCleaner':
+    def from_csv(cls, pasta_dados: str = 'data', *args, **kwargs) -> 'DataCleaner':
         """
         Cria uma nova instância de DataCleaner a partir de um arquivo CSV (Construtor Alternativo).
 
         Parameters
         ----------
-        caminho_arquivo : str
-            Caminho para o arquivo CSV a ser carregado.
+        pasta_dados : str, opcional
+            Caminho do diretório onde o arquivo de dados (definido em DATA_FILE_NAME no .env) está localizado. 
+            O valor padrão é 'data'.
         *args
             Argumentos posicionais repassados para o __init__.
         **kwargs
@@ -86,8 +101,25 @@ class DataCleaner:
         # utiliza o pop() para extrair o encoding (caso exista). Se não existir, usa None ou 'utf-8' como padrão.
         encoding_csv = kwargs.pop('encoding', 'utf-8')
 
-        # repassa apenas o 'encoding' para o pd.read_csv
-        df = pd.read_csv(caminho_arquivo, encoding = encoding_csv)
+        # tenta carregar o nome do arquivo a partir da variável de ambiente
+        file_name = os.getenv("DATA_FILE_NAME")
+
+        if not file_name:
+            logger.error("A variável 'DATA_FILE_NAME' não foi encontrada no ambiente.")
+            raise EnvironmentError("DATA_FILE_NAME é obrigatória para o from_csv")
+        
+        # constrói o caminho completo do arquivo: pasta_dados/file_name
+        caminho_completo = os.path.join(pasta_dados, file_name)
+
+        logger.info(f"Tentando carregar dados de: {caminho_completo}")
+
+        try:
+            # utiliza o caminho completo e a lógica de encoding para ler o CSV
+            df = pd.read_csv(caminho_completo, encoding = encoding_csv)
+            logging.info("Dados carregados com sucesso")
+        except FileNotFoundError:
+            logger.error(f"Arquivo não encontrado no caminho: {caminho_completo}")
+            raise FileNotFoundError(f"Verifique se o arquivo '{file_name}' está em '{pasta_dados}'.")
 
         # repassa os outros args e kwargs para que o __init__ possa utilizá-los
         return cls(df, *args, **kwargs)
