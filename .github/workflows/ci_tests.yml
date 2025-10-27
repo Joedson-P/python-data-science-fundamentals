@@ -1,0 +1,42 @@
+name: CI - Testes Unitários
+
+on:
+  # O workflow será disparado em dois eventos:
+  push:
+    branches: [ main, develop, feature/** ] # Em push para estas branches
+  pull_request:
+    branches: [ main, develop ] # Em PRs que visam estas branches
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Define o sistema operacional da máquina virtual do GitHub
+
+    steps:
+    - name: Checkout Código
+      uses: actions/checkout@v4 # Baixa o repositório
+
+    - name: Configurar Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip' # Usa cache para acelerar a instalação de dependências
+
+    - name: Instalar Dependências
+      run: |
+        pip install -r requirements.txt
+        # Instala o dotenv para carregar as variáveis no CI
+        pip install python-dotenv
+
+    - name: Configurar Arquivos de Teste
+      run: |
+        # 1. Cria a pasta 'data' e copia o CSV de teste para ela
+        mkdir -p data
+        cp df_produtos_500k.csv data/df_produtos_500k.csv
+
+        # 2. Cria o arquivo .env com as configurações de teste
+        echo "DATA_FILE_NAME=df_produtos_500k.csv" >> .env
+
+    - name: Rodar Testes Unitários com Pytest
+      run: |
+        # O pytest rodará com todos os arquivos configurados
+        pytest
