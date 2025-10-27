@@ -21,7 +21,7 @@ jobs:
         python-version: '3.12'
         cache: 'pip' # Usa cache para acelerar a instalação de dependências
 
-    - - name: Instalar Dependências (Tentativa Robusta)
+    - name: Instalar Dependências (Tentativa Robusta)
       run: |
         # 1. Garante que o pip está atualizado para o ambiente CI
         python -m pip install --upgrade pip
