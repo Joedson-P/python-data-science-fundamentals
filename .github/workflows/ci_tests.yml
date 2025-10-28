@@ -1,0 +1,43 @@
+name: CI - Testes Unitários
+
+on:
+  # O workflow será disparado em dois eventos:
+  push:
+    branches: [ main, develop, feature/** ] # Em push para estas branches
+  pull_request:
+    branches: [ main, develop ] # Em PRs que visam estas branches
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Define o sistema operacional da máquina virtual do GitHub
+
+    steps:
+    - name: Checkout Código
+      uses: actions/checkout@v4 # Baixa o repositório
+
+    - name: Configurar Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip' # Usa cache para acelerar a instalação de dependências
+
+    - name: Instalar Dependências (Foco CI)
+      run: |
+        python -m pip install --upgrade pip
+        
+        # Instala apenas as bibliotecas necessárias para rodar o DataCleaner e os testes
+        # Garantindo que pywinpty e outros pacotes de desenvolvimento sejam ignorados.
+        pip install pandas pytest python-dotenv --no-cache-dir
+
+    - name: Configurar Arquivos de Teste
+      run: |
+        # 1. Cria a pasta 'data'
+        mkdir -p data
+
+        # 2. Cria o arquivo .env com as configurações de teste
+        echo "DATA_FILE_NAME=df_teste_ci.csv" >> .env
+
+    - name: Rodar Testes Unitários com Pytest
+      run: |
+        # O pytest rodará com todos os arquivos configurados
+        pytest

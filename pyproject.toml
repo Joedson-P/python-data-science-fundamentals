@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# Configurações do pacote, seguindo o padrão PEP 621
+name = "datacleaner-projeto" # Nome do pacote (minúsculas e hífens)
+version = "0.1.0"
+authors = [
+    {name = "Joedson Pereira", email = "joedson.pereira96@gmail.com"},
+]
+description = "Um pacote modularizado para limpeza e transformação de dados em projetos de Data Science."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+keywords = ["data-science", "limpeza-de-dados", "etl", "modularidade"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+]
+
+# Dependências de Produção (que devem ser instaladas com o pacote)
+dependencies = [
+    "pandas>=2.0.0",
+    "python-dotenv",
+]
+
+[project.urls]
+Homepage = "https://github.com/Joedson-P/python-data-science-fundamentals"
+Issues = "https://github.com/Joedson-P/python-data-science-fundamentals/issues"
+
+[tool.setuptools.packages.find]
+# Diz ao setuptools para procurar pacotes dentro da pasta 'src'
+where = ["src"]

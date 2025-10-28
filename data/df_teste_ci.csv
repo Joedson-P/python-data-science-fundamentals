@@ -1,0 +1,5 @@
+id_produto,preco_unitario,quantidade_vendida,categoria
+1,10.0,2,A
+2,20.0,5,B
+3,5.0,1,A
+4,15.0,10,C
