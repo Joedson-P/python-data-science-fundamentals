@@ -21,21 +21,13 @@ jobs:
         python-version: '3.12'
         cache: 'pip' # Usa cache para acelerar a instalação de dependências
 
-    - name: Instalar Dependências (Tentativa Robusta)
+    - name: Instalar Dependências (Foco CI)
       run: |
-        # 1. Garante que o pip está atualizado para o ambiente CI
         python -m pip install --upgrade pip
         
-        # 2. Imprime o conteúdo do requirements.txt para DEBUG (CRUCIAL!)
-        echo "Conteúdo do requirements.txt:"
-        cat requirements.txt
-        
-        # 3. Instala todas as dependências com tratamento de erro
-        # O '--no-cache-dir' evita problemas de cache na VM
-        pip install -r requirements.txt --no-cache-dir
-        
-        # 4. Instala python-dotenv separadamente, apenas para garantir
-        pip install python-dotenv
+        # Instala apenas as bibliotecas necessárias para rodar o DataCleaner e os testes
+        # Garantindo que pywinpty e outros pacotes de desenvolvimento sejam ignorados.
+        pip install pandas pytest python-dotenv --no-cache-dir
 
     - name: Configurar Arquivos de Teste
       run: |
