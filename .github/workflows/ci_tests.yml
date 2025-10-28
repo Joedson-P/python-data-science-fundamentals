@@ -31,9 +31,8 @@ jobs:
 
     - name: Configurar Arquivos de Teste
       run: |
-        # 1. Cria a pasta 'data' e copia o CSV de teste para ela
+        # 1. Cria a pasta 'data'
         mkdir -p data
-        cp data/df_teste_ci.csv data/df_teste_ci.csv
 
         # 2. Cria o arquivo .env com as configurações de teste
         echo "DATA_FILE_NAME=df_teste_ci.csv" >> .env
